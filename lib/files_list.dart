@@ -98,6 +98,7 @@ class _FileListState extends State<StatefulWidget> {
             return InkWell(
               child: SizedBox(
                 height: 40,
+                width: MediaQuery.of(context).size.width,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
@@ -114,39 +115,44 @@ class _FileListState extends State<StatefulWidget> {
                     SizedBox(
                       width: 10,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          fileName,
-                          style: TextStyle(fontSize: 12),
-                          overflow: TextOverflow.fade,
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              desc,
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.w400),
-                            ),
-                            SizedBox(
-                              width: 60,
-                            ),
-                            Text(
-                              file.statSync().modified.toString(),
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.w400),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
                     Expanded(
-                      child: SizedBox(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                                fileName,
+                                style: TextStyle(fontSize: 12),
+                                softWrap: false,
+                                overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                desc,
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.w400),
+                              ),
+                              SizedBox(
+                                width: 60,
+                              ),
+                              Text(
+                                file.statSync().modified.toString(),
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.w400),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Spacer(),
+                    SizedBox(
+                      width: 10,
                     ),
                     Icon(Icons.arrow_forward),
                     SizedBox(

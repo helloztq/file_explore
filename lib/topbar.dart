@@ -150,12 +150,14 @@ class _TopbarState extends State<StatefulWidget> {
           ),
         ),
         FlatButton(
-            onPressed: () {
-              if (manager.curPath.path != DEFAULT_PATH) {
-                manager.curPath.reset(DEFAULT_PATH);
-                manager.emit('CHANGE_DIR');
-              }
-            },
+          onPressed: () {
+            if (manager.curPath.path != DEFAULT_PATH) {
+              manager.curPath.reset(DEFAULT_PATH);
+              manager.emit('CHANGE_DIR');
+            }
+          },
+          color: Colors.black12,
+          child: Container(
             child: Row(
               children: [
                 Spacer(),
@@ -164,12 +166,26 @@ class _TopbarState extends State<StatefulWidget> {
                   width: 5,
                 ),
                 Text(
-                  '点击返回Home文件夹',
+                  '返回Home文件夹',
                   style: Theme.of(context).textTheme.bodyText1,
                 ),
                 Spacer()
               ],
-            )),
+            ),
+            
+            // decoration: BoxDecoration(
+            //   color: Colors.white,
+            //   gradient: LinearGradient(colors: [Colors.white, Colors.black12]),
+            //   // boxShadow: <BoxShadow>[
+            //   //   BoxShadow(
+            //   //     color: Colors.black38,
+            //   //     offset: Offset(0.0, 1.0),
+            //   //     blurRadius: 1.0
+            //   //   )
+            //   // ]
+            // ),
+          )
+        ),
       ],
     );
   }
