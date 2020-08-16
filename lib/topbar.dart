@@ -13,13 +13,13 @@ class _TopbarState extends State<StatefulWidget> {
   void initState() {
     super.initState();
 
-    manager.on("CHANGE_DIR", onChangeDir);
+    gManager.on("CHANGE_DIR", onChangeDir);
   }
 
   @override
   void dispose() {
     super.dispose();
-    manager.off("CHANGE_DIR", onChangeDir);
+    gManager.off("CHANGE_DIR", onChangeDir);
   }
 
   void onChangeDir(dynamic) {
@@ -28,9 +28,9 @@ class _TopbarState extends State<StatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var dirs = manager.dirs;
+    var dirs = gManager.dirs;
     var tabWidgets = <Widget>[];
-    var index = manager.index;
+    var index = gManager.index;
 
     for (int i = 0; i < dirs.length; ++i) {
       PathInfo pathInfo = dirs[i];
@@ -41,24 +41,24 @@ class _TopbarState extends State<StatefulWidget> {
       var length = names.length;
       for (int j = 0; j < length; ++j) {
         widgets.add(SizedBox(
-            child: InkWell(
-          child: Text(
-            " " + names[j] + " ",
-            style: TextStyle(
-              color: index == i ? Theme.of(context).primaryColor : Colors.black,
-              fontSize: 13,
+          child: InkWell(
+            child: Text(
+              " " + names[j] + " ",
+              style: TextStyle(
+                color: index == i ? Theme.of(context).primaryColor : Colors.black,
+                fontSize: 13,
+              ),
             ),
-          ),
-          onTap: () {
-            if (manager.index == i) {
-              var subPath = pathInfo.subPath(j + 1);
-              pathInfo.reset(subPath);
-              manager.emit("CHANGE_DIR");
-            } else {
-              manager.index = i;
-              manager.emit("CHANGE_DIR");
-            }
-          },
+            onTap: () {
+              if (gManager.index == i) {
+                var subPath = pathInfo.subPath(j + 1);
+                pathInfo.reset(subPath);
+                gManager.emit("CHANGE_DIR");
+              } else {
+                gManager.index = i;
+                gManager.emit("CHANGE_DIR");
+              }
+            },
         )));
         if (j < length - 1) {
           widgets.add(SizedBox(
@@ -90,6 +90,8 @@ class _TopbarState extends State<StatefulWidget> {
                   ),
                 ),
                 Container(
+                  color: Colors.black12,
+                  height: double.infinity,
                   child: dirs.length > 1
                       ? IconButton(
                           iconSize: 15,
@@ -99,24 +101,24 @@ class _TopbarState extends State<StatefulWidget> {
                           color: Color.fromRGBO(86, 86, 86, 1.0),
                           padding: EdgeInsets.all(0),
                           onPressed: () {
-                            manager.closeDir(i);
-                            manager.emit("CHANGE_DIR");
+                            gManager.closeDir(i);
+                            gManager.emit("CHANGE_DIR");
                           },
                         )
                       : null,
                 ),
                 Container(
-                  width: 1,
+                  width: 0.1,
                   color: Color.fromRGBO(200, 200, 200, 1.0),
                 ),
               ],
             ),
           ),
           onTap: () {
-            if (i == manager.index) return;
+            if (i == gManager.index) return;
 
-            manager.index = i;
-            manager.emit("CHANGE_DIR");
+            gManager.index = i;
+            gManager.emit("CHANGE_DIR");
           },
         ),
       );
@@ -128,10 +130,10 @@ class _TopbarState extends State<StatefulWidget> {
         child: IconButton(
           iconSize: 15,
           padding: EdgeInsets.all(0),
-          icon: Icon(Icons.add),
+          icon: Icon(Icons.add, size: 30,),
           onPressed: () {
-            manager.openDir();
-            manager.emit("CHANGE_DIR");
+            gManager.openDir();
+            gManager.emit("CHANGE_DIR");
             setState(() {});
           },
         ),
@@ -142,49 +144,56 @@ class _TopbarState extends State<StatefulWidget> {
     return Column(
       children: <Widget>[
         Container(
-          height: 20,
+          height: 40,
+          // margin: EdgeInsets.only(bottom: 0),
           width: MediaQuery.of(context).size.width,
           color: Color.fromRGBO(154, 154, 154, 1.0),
           child: Row(
             children: tabWidgets,
           ),
         ),
-        FlatButton(
-          onPressed: () {
-            if (manager.curPath.path != DEFAULT_PATH) {
-              manager.curPath.reset(DEFAULT_PATH);
-              manager.emit('CHANGE_DIR');
-            }
-          },
+        SizedBox(
+          height: 1
+        ),
+        Container(
           color: Colors.black12,
-          child: Container(
-            child: Row(
-              children: [
-                Spacer(),
-                Icon(Icons.home),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  '返回Home文件夹',
-                  style: Theme.of(context).textTheme.bodyText1,
-                ),
-                Spacer()
-              ],
-            ),
-            
-            // decoration: BoxDecoration(
-            //   color: Colors.white,
-            //   gradient: LinearGradient(colors: [Colors.white, Colors.black12]),
-            //   // boxShadow: <BoxShadow>[
-            //   //   BoxShadow(
-            //   //     color: Colors.black38,
-            //   //     offset: Offset(0.0, 1.0),
-            //   //     blurRadius: 1.0
-            //   //   )
-            //   // ]
-            // ),
-          )
+          child:     FlatButton(
+            onPressed: () {
+              if (gManager.curPath.path != DEFAULT_PATH) {
+                gManager.curPath.reset(DEFAULT_PATH);
+                gManager.emit('CHANGE_DIR');
+              }
+            },
+            // color: Colors.black12,
+            child: Container(
+              child: Row(
+                children: [
+                  Spacer(),
+                  Icon(Icons.home),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    '返回Home文件夹',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  Spacer()
+                ],
+              ),
+              
+              // decoration: BoxDecoration(
+              //   color: Colors.white,
+              //   gradient: LinearGradient(colors: [Colors.white, Colors.black12]),
+              //   // boxShadow: <BoxShadow>[
+              //   //   BoxShadow(
+              //   //     color: Colors.black38,
+              //   //     offset: Offset(0.0, 1.0),
+              //   //     blurRadius: 1.0
+              //   //   )
+              //   // ]
+              // ),
+            )
+          ),
         ),
       ],
     );

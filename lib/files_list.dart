@@ -13,12 +13,12 @@ class FilesList extends StatefulWidget {
 
 class _FileListState extends State<StatefulWidget> {
   List<FileSystemEntity> _files = [];
-  List<FileSystemEntity> _copyFiles = [];
+  // List<FileSystemEntity> _copyFiles = [];
 
   String oldPath;
 
   _FileListState() {
-    open(manager.curPath);
+    open(gManager.curPath);
   }
 
   @override
@@ -27,17 +27,17 @@ class _FileListState extends State<StatefulWidget> {
 //      _files = value.listSync();
 //    });
     super.initState();
-    manager.on("CHANGE_DIR", onChangeDir);
+    gManager.on("CHANGE_DIR", onChangeDir);
   }
 
   @override
   void dispose() {
-    manager.off("CHANGE_DIR", onChangeDir);
+    gManager.off("CHANGE_DIR", onChangeDir);
     super.dispose();
   }
 
   void onChangeDir(dynamic arg) {
-    open(manager.curPath);
+    open(gManager.curPath);
     setState(() {});
   }
 
@@ -71,111 +71,111 @@ class _FileListState extends State<StatefulWidget> {
     }
   }
 
+  Widget itemBuilder(BuildContext context, int index) {
+    var file = _files[index];
+    var path = file.path;
+    var lastSep = path.lastIndexOf('/');
+    var fileName = path.substring(lastSep + 1);
+    var desc;
+    if (FileSystemEntity.isDirectorySync(path)) {
+      try {
+        var len = Directory(path).listSync().length;
+        desc = "$len项";
+      } on IOException {
+        desc = "0项";
+        print("desc exception");
+      }
+    } else {
+      desc = "${file.statSync().size}kb";
+    }
+
+    return InkWell(
+      child: SizedBox(
+        height: 40,
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 10,
+            ),
+            Icon(
+              FileSystemEntity.isDirectorySync(path)
+                  ? Icons.folder
+                  : Icons.description,
+              color: Theme.of(context).primaryColor,
+              size: 40,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    fileName,
+                    style: TextStyle(fontSize: 13),
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        desc,
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        width: 60,
+                      ),
+                      Text(
+                        file.statSync().modified.toString(),
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.w400),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),     
+            // Spacer(),
+            SizedBox(
+              width: 10,
+            ),
+            Icon(Icons.arrow_forward),
+            SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+      ),
+      onTap: () {
+        print("点击文件: $path");
+        if (FileSystemEntity.isDirectorySync(path)) {
+          gManager.curPath.reset(path);
+          gManager.emit("CHANGE_DIR");
+        }
+      },
+      onLongPress: () {
+        print("路径 $path");
+        if (file.existsSync()) {
+          gManager.addCopyFile(path);
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
         ListView.separated(
-          itemBuilder: (BuildContext context, int index) {
-            var file = _files[index];
-            var path = file.path;
-            var lastSep = path.lastIndexOf('/');
-            var fileName = path.substring(lastSep + 1);
-
-            var desc;
-            if (FileSystemEntity.isDirectorySync(path)) {
-              try {
-                var len = Directory(path).listSync().length;
-                desc = "$len项";
-              } on IOException {
-                desc = "0项";
-                print("desc exception");
-              }
-            } else {
-              desc = "${file.statSync().size}kb";
-            }
-
-            return InkWell(
-              child: SizedBox(
-                height: 40,
-                width: MediaQuery.of(context).size.width,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      FileSystemEntity.isDirectorySync(path)
-                          ? Icons.folder
-                          : Icons.description,
-                      color: Theme.of(context).primaryColor,
-                      size: 40,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                                fileName,
-                                style: TextStyle(fontSize: 12),
-                                softWrap: false,
-                                overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Text(
-                                desc,
-                                style: TextStyle(
-                                    fontSize: 10, fontWeight: FontWeight.w400),
-                              ),
-                              SizedBox(
-                                width: 60,
-                              ),
-                              Text(
-                                file.statSync().modified.toString(),
-                                style: TextStyle(
-                                    fontSize: 10, fontWeight: FontWeight.w400),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Spacer(),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(Icons.arrow_forward),
-                    SizedBox(
-                      width: 20,
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () {
-                print("点击文件: $path");
-                if (FileSystemEntity.isDirectorySync(path)) {
-                  manager.curPath.reset(path);
-                  manager.emit("CHANGE_DIR");
-                }
-              },
-              onLongPress: () {
-                print("路径 $path");
-                if (file.existsSync() && _copyFiles.indexOf(file) < 0) {
-                  _copyFiles.insert(0, file);
-                }
-              },
-            );
-          },
+          itemBuilder: itemBuilder,
           separatorBuilder: (BuildContext context, int index) {
             return Divider(
               height: 10,

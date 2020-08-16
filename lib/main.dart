@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'topbar.dart';
 import 'files_list.dart';
-
-
 
 void main() {
   runApp(MyApp());

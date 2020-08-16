@@ -136,4 +136,4 @@ class FileManager {
   }
 }
 
-var manager = FileManager();
+var gManager = FileManager();

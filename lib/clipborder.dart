@@ -40,15 +40,16 @@ class _PasteViewState extends State<StatefulWidget>
           top: 0,
           child: Container(
             width: 200,
-//            height: 100,
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5))),
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5)
+              )
+            ),
             child: ListView.separated(
               itemBuilder: (BuildContext context, int index) {
-                var path = manager.copyFiles[index];
+                var path = gManager.copyFiles[index];
                 var lastSep = path.lastIndexOf('/');
                 var fileName = path.substring(lastSep + 1);
 
@@ -58,7 +59,7 @@ class _PasteViewState extends State<StatefulWidget>
                     children: <Widget>[
                       Icon(
                         Icons.library_books,
-                        color: Colors.yellow[300],
+                        color: Colors.yellow[800],
                         size: 40,
                       ),
                       SizedBox(
@@ -68,6 +69,7 @@ class _PasteViewState extends State<StatefulWidget>
                         fileName,
                         style: TextStyle(
                           fontSize: 12,
+                          decoration: TextDecoration.none,
                           color: Colors.grey[850],
                         ),
                       ),
@@ -82,9 +84,10 @@ class _PasteViewState extends State<StatefulWidget>
                             height: 25,
                             child: OutlineButton(
                               onPressed: () {
-                                setState(() {
-                                  manager.removeCopyFile(path);
-                                });
+                                // setState(() {
+                                //   gManager.removeCopyFile(path);
+                                // });
+                                print("====");
                               },
                               child: Text(
                                 '删除',
@@ -105,7 +108,9 @@ class _PasteViewState extends State<StatefulWidget>
                               ),
                               shape: StadiumBorder(),
                               color: Theme.of(context).primaryColor,
-                              onPressed: () {},
+                              onPressed: () {
+                                print("path: ${path}");
+                              },
                               textColor: Colors.white,
                             ),
                           ),
@@ -114,17 +119,14 @@ class _PasteViewState extends State<StatefulWidget>
                       ),
                     ],
                   ),
-//                    color: Colors.green,
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
                 return Divider(
                   height: 30,
-//                  indent: 12,
-//                  endIndent: 12,
                 );
               },
-              itemCount: manager.copyFiles.length,
+              itemCount: gManager.copyFiles.length,
               padding: EdgeInsets.all(10),
             ),
           ),
