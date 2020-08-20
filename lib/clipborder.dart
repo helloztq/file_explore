@@ -1,27 +1,35 @@
+import 'dart:io';
+
 import 'package:file_explore3/manager.dart';
 import 'package:flutter/material.dart';
+import 'package:file_utils/file_utils.dart';
+
+import 'manager.dart';
+import 'toast.dart';
 
 class _PasteView extends StatefulWidget {
+  final BuildContext rootContext;
+
+  const _PasteView(this.rootContext);
+
   @override
-  State<StatefulWidget> createState() {
+  _PasteViewState createState() {
     return _PasteViewState();
   }
 }
 
-class _PasteViewState extends State<StatefulWidget>
+class _PasteViewState extends State<_PasteView>
     with SingleTickerProviderStateMixin {
-
   // Animation _animation;
-  var _right = -200.0;
+  var _right = .0;
 
   @override
   void initState() {
-
-    Future.delayed(Duration(microseconds: 10), () {
-      setState(() {
-        _right = 0;
-      });
-    });
+    // Future.delayed(Duration(microseconds: 10), () {
+    //   setState(() {
+    //     _right = 0;
+    //   });
+    // });
     super.initState();
   }
 
@@ -41,17 +49,14 @@ class _PasteViewState extends State<StatefulWidget>
           child: Container(
             width: 200,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(5),
-                bottomLeft: Radius.circular(5)
-              )
-            ),
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(5),
+                    bottomLeft: Radius.circular(5))),
             child: ListView.separated(
               itemBuilder: (BuildContext context, int index) {
                 var path = gManager.copyFiles[index];
-                var lastSep = path.lastIndexOf('/');
-                var fileName = path.substring(lastSep + 1);
+                var baseName = FileUtils.basename(path);
 
                 return Container(
 //                  height: 80,
@@ -66,7 +71,7 @@ class _PasteViewState extends State<StatefulWidget>
                         height: 10,
                       ),
                       Text(
-                        fileName,
+                        baseName,
                         style: TextStyle(
                           fontSize: 12,
                           decoration: TextDecoration.none,
@@ -84,10 +89,9 @@ class _PasteViewState extends State<StatefulWidget>
                             height: 25,
                             child: OutlineButton(
                               onPressed: () {
-                                // setState(() {
-                                //   gManager.removeCopyFile(path);
-                                // });
-                                print("====");
+                                setState(() {
+                                  gManager.removeCopyFile(path);
+                                });
                               },
                               child: Text(
                                 '删除',
@@ -109,7 +113,40 @@ class _PasteViewState extends State<StatefulWidget>
                               shape: StadiumBorder(),
                               color: Theme.of(context).primaryColor,
                               onPressed: () {
-                                print("path: ${path}");
+                                // if (FileUtils.)
+                                String openDir = gManager.curPath.path;
+
+                                if (FileSystemEntity.isFileSync(path)) {
+                                  String baseName = FileUtils.basename(path);
+                                  String newPath = openDir;
+                                  if (openDir[openDir.length - 1] != "/") {
+                                    newPath = newPath + "/";
+                                  }
+                                  newPath += baseName;
+
+                                  print("拷贝文件：${newPath}");
+
+                                  File f = File(path);
+                                  f.copy(newPath).then((value) {
+                                      gManager.emit("CHANGE_DIR");
+                                  });
+                                }
+
+                                // if (FileSystemEntity.isDirectorySync(path) &&
+                                //     curdir == path) {
+                                // final snackBar = SnackBar(
+                                //   content: Text('Helo'),
+                                //   behavior: SnackBarBehavior.floating,
+                                //   duration: Duration(seconds: 2),
+                                // );
+
+                                // Scaffold.of(widget.rootContext).removeCurrentSnackBar()
+                                // Scaffold.of(widget.rootContext).showSnackBar(snackBar);
+                                // }
+                                // toast(context, "床前明月光，疑是地上霜！");
+
+                                // gManager.pastFile(path);
+                                // print("dirname: ${FileUtils.dirname(path)}");
                               },
                               textColor: Colors.white,
                             ),
@@ -138,11 +175,14 @@ class _PasteViewState extends State<StatefulWidget>
 }
 
 class ClipBorder extends StatelessWidget {
- 
+  final BuildContext rootContext;
+
+  const ClipBorder(this.rootContext);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: _PasteView(),
+      child: _PasteView(this.rootContext),
     );
   }
 }

@@ -64,6 +64,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.2.1"
+  file_utils:
+    dependency: "direct main"
+    description:
+      name: file_utils
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -74,6 +81,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  globbing:
+    dependency: transitive
+    description:
+      name: globbing
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.3.1"
   intl:
     dependency: transitive
     description:

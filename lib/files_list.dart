@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:file_utils/file_utils.dart';
 import 'manager.dart';
 import 'clipborder.dart';
 
@@ -74,8 +75,9 @@ class _FileListState extends State<StatefulWidget> {
   Widget itemBuilder(BuildContext context, int index) {
     var file = _files[index];
     var path = file.path;
-    var lastSep = path.lastIndexOf('/');
-    var fileName = path.substring(lastSep + 1);
+
+    var baseName = FileUtils.basename(path);
+
     var desc;
     if (FileSystemEntity.isDirectorySync(path)) {
       try {
@@ -115,7 +117,7 @@ class _FileListState extends State<StatefulWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    fileName,
+                    baseName,
                     style: TextStyle(fontSize: 13),
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
@@ -142,12 +144,16 @@ class _FileListState extends State<StatefulWidget> {
                   ),
                 ],
               ),
-            ),     
+            ),
             // Spacer(),
             SizedBox(
               width: 10,
             ),
-            Icon(Icons.arrow_forward),
+            SizedBox(
+              child: FileSystemEntity.isDirectorySync(path)
+                  ? Icon(Icons.arrow_forward)
+                  : null,
+            ),
             SizedBox(
               width: 20,
             ),
@@ -162,10 +168,69 @@ class _FileListState extends State<StatefulWidget> {
         }
       },
       onLongPress: () {
-        print("路径 $path");
-        if (file.existsSync()) {
-          gManager.addCopyFile(path);
-        }
+        // print("路径 $path");
+        showModalBottomSheet(
+            context: context,
+            barrierColor: Color.fromRGBO(100, 100, 100, 0),
+            backgroundColor: Color.fromRGBO(230, 230, 230, 1),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10)
+                )
+              ),
+            builder: (context) {
+              return Container(
+                height: 80,
+                child: Row(
+                  children: [
+                    Spacer(),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.copy),
+                          onPressed: () {
+                            if (file.existsSync()) {
+                              gManager.addCopyFile(path);
+                            }
+                            Navigator.pop(context);
+                          },
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Text(
+                          "复制",
+                          style: TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                    Spacer(),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.copy),
+                          onPressed: () {
+                            if (file.existsSync()) {
+                              file.delete();
+                              gManager.emit("CHANGE_DIR");
+                            }
+                            Navigator.pop(context);
+                          },
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Text(
+                          "删除",
+                          style: TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                    Spacer(),
+                  ],
+                ),
+              );
+            });
       },
     );
   }
@@ -200,11 +265,26 @@ class _FileListState extends State<StatefulWidget> {
             child: IconButton(
               icon: Icon(Icons.content_copy),
               onPressed: () {
-                showDialog(
-                  context: context,
-                  child: ClipBorder(),
-                  barrierDismissible: true,
-                );
+                // showDialog(
+                //   context: context,
+                //   child: ClipBorder(context),
+                //   barrierDismissible: true,
+                // );
+                var c = context;
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                        pageBuilder: (BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation) {
+                          return ClipBorder(c);
+                        },
+                        opaque: false,
+                        barrierDismissible: true,
+                        barrierColor: Color.fromRGBO(100, 100, 100, 0.4),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                        barrierLabel: "Good"));
               },
               color: Colors.lightBlue,
             ),

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 const String DEFAULT_PATH = "/storage/emulated/0/";
 
 typedef void EventCallback(dynamic arg);
@@ -99,7 +101,7 @@ class FileManager {
       _curIndex = _curIndex - 1;
 
       if (_curIndex < 0) {
-          _curIndex = 0;
+        _curIndex = 0;
       }
     }
   }
